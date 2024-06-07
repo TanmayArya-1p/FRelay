@@ -1,7 +1,5 @@
 import math
 from datetime import datetime, date
-import logging
-import hashlib
 import time
 import threading
 from termcolor import colored
@@ -10,14 +8,14 @@ import uuid
 import random
 import glob
 from tabulate import tabulate
+from auth import RouteAuthSession
 
 def generateID():
 	return(str(uuid.uuid4()).split("-")[-1])
 
-
 class RouteManager():
 	def __init__(self,poolSize : int = 10,route_pool : list = [] ,timeout : int = 10 ):
-		self.route_pool = []`
+		self.route_pool = []
 		self.poolSize = poolSize
 		self.status_bar = ""
 		if(route_pool==[]):
@@ -70,6 +68,7 @@ class RouteManager():
 
 	def flush(self):
 		self.route_pool = []
+		RouteAuthSession.resetTable()
 		files = glob.glob(os.getcwd()+"\\tmp\\*")
 		for f in files:
 			os.remove(f)
@@ -88,6 +87,7 @@ class Route():
 			self.rid = generateID()
 		else:
 			self.rid = rid
+		self.auth = None
 		self.bufferLimit = bufferLimit
 		self.isOpen =isOpen
 		self.uploaded_time = uploaded_time
@@ -109,6 +109,7 @@ class Route():
 			print(f"{self} is already bound")
 
 	def Open(self,remv=True):
+		self.auth.destroy()
 		self.isOpen = True
 		self.file = None
 

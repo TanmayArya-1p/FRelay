@@ -1,10 +1,8 @@
-from typing import Union
-import json
 from rm import *
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 import threading
-
+from auth import RouteAuthSession
 
 rm = RouteManager()
 
@@ -24,26 +22,25 @@ async def reset():
     return {"message" : "OK"}
 
 @app.post("/upload")
-async def uploadFile(file: UploadFile):
+async def uploadFile(file: UploadFile,authkey):
     print(file.filename)
     openR = rm.findOpenRoute()
     if(openR!=None):
         print(openR)
         openR.Close(file)
-
-        return {"route_id" : openR.rid}
+        openR.auth= RouteAuthSession(openR,authkey)
+        return {"route_id" : openR.rid, "timeout":rm.timeout}
     else:
         return {"message":"ALL ROUTES OCCUPIED"}
 
 def deleter(path):
-    time.sleep(5)
+    time.sleep(rm.timeout)
     os.remove(path)
 
 @app.get("/fetch/{route_id}")
-async def fetchFile(route_id):
+async def fetchFile(route_id,authkey):
     i = rm.routeLookup(route_id)
-    if(i!=None and i.isOpen==False):
-
+    if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
         returner = FileResponse(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext)
         i.Open(remv=False)
         threading.Thread(target=deleter,args=(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext,),daemon=True).start()
