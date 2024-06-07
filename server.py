@@ -3,9 +3,13 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 import threading
 from auth import RouteAuthSession
-
+tags_metadata = [
+    {
+        "name": "Methods",
+        "description": "",
+    }]
 rm = RouteManager()
-app = FastAPI(debug=True)
+app = FastAPI(debug=True, title="FRelay" , version=VERSION,docs_url="/simulate",openapi_tags=tags_metadata)
 
 
 def appendStatusStack(l,i,bufferLimit = 4):
@@ -15,18 +19,18 @@ def appendStatusStack(l,i,bufferLimit = 4):
     else:
         l.append(i+"    "+str(datetime.now()).split(".")[0])
 
-@app.get("/")
+@app.get("/",tags=["Methods"])
 async def home():
     return {"message" : "Relay Server is Alive"}
 
-@app.get("/reset")
+@app.get("/reset",tags=["Methods"])
 async def reset():
     print("RESET")
     appendStatusStack(rm.status_bar,"RE-POPULATING ROUTE POOL")
     rm.flush()
     return {"message" : "OK"}
 
-@app.post("/upload")
+@app.post("/upload",tags=["Methods"])
 async def uploadFile(file: UploadFile,authkey):
     print(file.filename)
     openR = rm.findOpenRoute()
@@ -43,7 +47,7 @@ def deleter(path):
     time.sleep(rm.timeout)
     os.remove(path)
 
-@app.get("/fetch/{route_id}")
+@app.get("/fetch/{route_id}",tags=["Methods"])
 async def fetchFile(route_id,authkey):
     i = rm.routeLookup(route_id)
     if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
@@ -56,7 +60,7 @@ async def fetchFile(route_id,authkey):
     else:
         return {"message":f"route id {route_id} doesnt exit."}
 
-@app.get("/routes")
+@app.get("/routes",tags=["Methods"])
 async def routesfetch():
     d = {}
     for i in rm.route_pool:
