@@ -10,6 +10,8 @@ import glob
 from tabulate import tabulate
 from auth import RouteAuthSession
 
+VERSION = "v1.0"
+
 def generateID():
 	return(str(uuid.uuid4()).split("-")[-1])
 
@@ -17,7 +19,7 @@ class RouteManager():
 	def __init__(self,poolSize : int = 10,route_pool : list = [] ,timeout : int = 10 ):
 		self.route_pool = []
 		self.poolSize = poolSize
-		self.status_bar = ""
+		self.status_bar = []
 		if(route_pool==[]):
 			self.populatePool(poolSize)
 		else:
@@ -28,10 +30,11 @@ class RouteManager():
 		self.terminatorThread.start()
 
 	def __terminator(self):
-		os.system('mode con: cols=35 lines=20')
 		while self.RunTerminator:
+
 			time.sleep(0.25)
 			os.system("cls")
+			print("FRelay",VERSION,end="\n\n")
 			l=[]
 			enum = 0
 			for i in self.route_pool:
@@ -47,7 +50,8 @@ class RouteManager():
 					i.Open()
 			try:
 				print(tabulate(l, headers=["SNO","ROUTE ID", "STATUS"], tablefmt="rounded_outline",colalign=("center","center","center")))
-				print(self.status_bar)
+				print("\nTASK HISTORY:")
+				[print(i) for i in self.status_bar]
 			except:
 				pass
 			

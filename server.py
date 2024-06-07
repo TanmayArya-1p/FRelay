@@ -5,9 +5,15 @@ import threading
 from auth import RouteAuthSession
 
 rm = RouteManager()
-
 app = FastAPI(debug=True)
 
+
+def appendStatusStack(l,i,bufferLimit = 4):
+    if(len(l) == bufferLimit):
+        l.pop(0)
+        l.append(i+"    "+str(datetime.now()).split(".")[0])
+    else:
+        l.append(i+"    "+str(datetime.now()).split(".")[0])
 
 @app.get("/")
 async def home():
@@ -16,9 +22,8 @@ async def home():
 @app.get("/reset")
 async def reset():
     print("RESET")
-    rm.status_bar="RESETTING......"
+    appendStatusStack(rm.status_bar,"RE-POPULATING ROUTE POOL")
     rm.flush()
-    rm.status_bar=""
     return {"message" : "OK"}
 
 @app.post("/upload")
@@ -27,6 +32,7 @@ async def uploadFile(file: UploadFile,authkey):
     openR = rm.findOpenRoute()
     if(openR!=None):
         print(openR)
+        appendStatusStack(rm.status_bar,f"RECEIVED FILE '{file.filename}' AT ROUTE '{openR.rid}'")
         openR.Close(file)
         openR.auth= RouteAuthSession(openR,authkey)
         return {"route_id" : openR.rid, "timeout":rm.timeout}
@@ -41,6 +47,7 @@ def deleter(path):
 async def fetchFile(route_id,authkey):
     i = rm.routeLookup(route_id)
     if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
+        appendStatusStack(rm.status_bar,f"DELIVERING FILE AT '/fetch/{route_id}'")
         returner = FileResponse(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext)
         i.Open(remv=False)
         threading.Thread(target=deleter,args=(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext,),daemon=True).start()
