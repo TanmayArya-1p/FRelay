@@ -6,4 +6,7 @@
 ## Run
 `fastapi run server.py --port <PORT>`
 
-#### Simulate Requests Through `/simulate`
+
+- Set Master Key at `auth.py`(Default Master Key: `123`)
+
+- Simulate Requests Through `/simulate`
