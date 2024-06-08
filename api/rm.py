@@ -12,6 +12,7 @@ from auth import RouteAuthSession
 
 VERSION = "v1.0"
 
+
 def generateID():
 	return(str(uuid.uuid4()).split("-")[-1])
 
