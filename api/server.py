@@ -88,6 +88,3 @@ async def routesfetch(master_key):
         appendStatusStack(rm.status_bar,"FETCH FAILED - INCORRECT MASTER KEY")
         return {"message" : "Fetch Failed"}
 
-
-if(__name__=="__main__"):
-    uvicorn.run("server:app" , port=8000 , reload=False)
