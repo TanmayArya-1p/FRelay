@@ -16,7 +16,8 @@ def generateID():
 	return(str(uuid.uuid4()).split("-")[-1])
 
 class RouteManager():
-	def __init__(self,poolSize : int = 10,route_pool : list = [] ,timeout : int = 10 ):
+	def __init__(self,poolSize : int = 10,route_pool : list = [] ,timeout : int = 10 , maxFileSize = math.inf):
+		self.maxFileSize= maxFileSize
 		self.route_pool = []
 		self.poolSize = poolSize
 		self.status_bar = []

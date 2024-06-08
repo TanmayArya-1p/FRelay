@@ -36,16 +36,19 @@ async def reset(master_key):
 
 @app.post("/upload",tags=["Methods"])
 async def uploadFile(file: UploadFile,authkey):
-    print(file.filename)
-    openR = rm.findOpenRoute()
-    if(openR!=None):
-        print(openR)
-        appendStatusStack(rm.status_bar,f"RECEIVED FILE '{file.filename}' AT ROUTE '{openR.rid}'")
-        openR.Close(file)
-        openR.auth= RouteAuthSession(openR,authkey)
-        return {"route_id" : openR.rid, "timeout":rm.timeout}
+    if(file.size<rm.maxFileSize):
+        print(file.filename)
+        openR = rm.findOpenRoute()
+        if(openR!=None):
+            print(openR)
+            appendStatusStack(rm.status_bar,f"RECEIVED FILE '{file.filename}' AT ROUTE '{openR.rid}' : SIZE = {file.size} BYTES")
+            openR.Close(file)
+            openR.auth= RouteAuthSession(openR,authkey)
+            return {"route_id" : openR.rid, "timeout":rm.timeout}
+        else:
+            return {"message":"ALL ROUTES OCCUPIED"}
     else:
-        return {"message":"ALL ROUTES OCCUPIED"}
+        return {"message" : f"Exceeded maxFileSize = {rm.maxFileSize} bytes"}
 
 def deleter(path):
     time.sleep(rm.timeout)
