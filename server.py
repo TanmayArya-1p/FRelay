@@ -2,7 +2,7 @@ from rm import *
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse
 import threading
-from auth import RouteAuthSession
+from auth import RouteAuthSession,verifyMasterKey
 tags_metadata = [
     {
         "name": "Methods",
@@ -20,15 +20,19 @@ def appendStatusStack(l,i,bufferLimit = 4):
         l.append(i+"    "+str(datetime.now()).split(".")[0])
 
 @app.get("/",tags=["Methods"])
-async def home():
+async def ping():
     return {"message" : "Relay Server is Alive"}
 
 @app.get("/reset",tags=["Methods"])
-async def reset():
+async def reset(master_key):
     print("RESET")
-    appendStatusStack(rm.status_bar,"RE-POPULATING ROUTE POOL")
-    rm.flush()
-    return {"message" : "OK"}
+    if(verifyMasterKey(master_key)):
+        appendStatusStack(rm.status_bar,"RE-POPULATING ROUTE POOL")
+        rm.flush()
+        return {"message" : "Reset Succeeded"}
+    else:
+        appendStatusStack(rm.status_bar,"RESET FAILED - INCORRECT MASTER KEY")
+        return {"message" : "Reset Failed"}
 
 @app.post("/upload",tags=["Methods"])
 async def uploadFile(file: UploadFile,authkey):
@@ -47,7 +51,7 @@ def deleter(path):
     time.sleep(rm.timeout)
     os.remove(path)
 
-@app.get("/fetch/{route_id}",tags=["Methods"])
+@app.get("/fetch/{routcre_id}",tags=["Methods"])
 async def fetchFile(route_id,authkey):
     i = rm.routeLookup(route_id)
     if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
