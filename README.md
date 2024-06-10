@@ -1,5 +1,5 @@
 ## Setup
-`git clone https://github.com/TanmayArya-1p/FRelay.git`
+`git -b session clone https://github.com/TanmayArya-1p/FRelay.git`
 
 `pip install -r requirements.txt`
 
