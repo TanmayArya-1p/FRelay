@@ -1,5 +1,3 @@
-#### Note: This is a Modifed version of FRelay in the main branch with session management
-
 ## Setup
 
 ####
