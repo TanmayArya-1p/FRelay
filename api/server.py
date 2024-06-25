@@ -67,9 +67,9 @@ async def fetchFile(route_id,authkey,master_key):
         i = rm.routeLookup(route_id)
         if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
             appendStatusStack(rm.status_bar,f"DELIVERING FILE AT '/fetch/{route_id}'")
-            returner = FileResponse(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext)
+            returner = FileResponse(os.getcwd()+"/tmp/"+str(i.rid)+"."+i.ext)
             i.Open(remv=False)
-            threading.Thread(target=deleter,args=(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext,),daemon=True).start()
+            threading.Thread(target=deleter,args=(os.getcwd()+"/tmp/"+str(i.rid)+"."+i.ext,),daemon=True).start()
             return returner
 
         else:

@@ -101,7 +101,7 @@ class RouteManager():
 	def flush(self):
 		self.route_pool = []
 		RouteAuthSession.resetTable()
-		files = glob.glob(os.getcwd()+"\\tmp\\*")
+		files = glob.glob(os.getcwd()+"/tmp/*")
 		for f in files:
 			os.remove(f)
 		self.populatePool(self.poolSize)
@@ -135,7 +135,7 @@ class Route():
 	
 			contents = self.file.read()
 			self.ext = file.filename.split(".")[-1]
-			with open(f"{os.getcwd()}\\tmp\\{self.rid}.{self.ext}", 'wb') as f:
+			with open(rf"{os.getcwd()}/tmp/{self.rid}.{self.ext}", 'wb') as f:
 				f.write(contents)
 				return True
 		else:
@@ -147,10 +147,10 @@ class Route():
 		self.file = None
 
 		self.uploaded_time = None
-		ret = (os.getcwd()+"\\tmp\\"+str(self.rid)+"."+self.ext)
+		ret = (os.getcwd()+r"/tmp/"+str(self.rid)+"."+self.ext)
 
 		if(remv):
-			os.remove(f".//tmp//{self.rid}.{self.ext}")
+			os.remove(rf"./tmp/{self.rid}.{self.ext}")
 			self.ext = None
 		return ret
 
