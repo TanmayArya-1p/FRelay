@@ -27,7 +27,7 @@ class RouteAuthSession():
         pswrd = authkey
         self.route = route
         self.route.auth = self
-        hash = sha256(pswrd.encode('utf-8')).hexdigest()+f"{bcrypt.gensalt().decode("utf-8")}"
+        hash = sha256(pswrd.encode('utf-8')).hexdigest()+f"{bcrypt.gensalt().decode('utf-8')}"
         cursor.execute(f"INSERT OR IGNORE INTO passhash VALUES('{self.route.rid}','{hash}');")
         del hash
         del pswrd
