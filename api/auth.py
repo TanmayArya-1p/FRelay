@@ -6,8 +6,11 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import hashlib
 import sqlite3
 import bcrypt
+from configparser import ConfigParser
 
-mkey = "123"
+config = ConfigParser()
+config.read("config.ini")
+mkey = dict(config._sections["frelay"])["masterkey"]
 
 MASTER_KEY = sha256(mkey.encode('utf-8')).hexdigest()
 del mkey
