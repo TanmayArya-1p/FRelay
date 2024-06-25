@@ -6,8 +6,11 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import hashlib
 import sqlite3
 import bcrypt
+from configparser import ConfigParser
 
-mkey = "123"
+config = ConfigParser()
+config.read("config.ini")
+mkey = dict(config._sections["frelay"])["masterkey"]
 
 MASTER_KEY = sha256(mkey.encode('utf-8')).hexdigest()
 del mkey
@@ -27,7 +30,7 @@ class RouteAuthSession():
         pswrd = authkey
         self.route = route
         self.route.auth = self
-        hash = sha256(pswrd.encode('utf-8')).hexdigest()+f"{bcrypt.gensalt().decode("utf-8")}"
+        hash = sha256(pswrd.encode('utf-8')).hexdigest()+f"{bcrypt.gensalt().decode('utf-8')}"
         cursor.execute(f"INSERT OR IGNORE INTO passhash VALUES('{self.route.rid}','{hash}');")
         del hash
         del pswrd

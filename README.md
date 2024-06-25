@@ -1,12 +1,20 @@
 ## Setup
-`git clone https://github.com/TanmayArya-1p/FRelay.git`
 
-`pip install -r requirements.txt`
+####
+    git clone https://github.com/TanmayArya-1p/FRelay.git
+    
+- Configure the Master Key(Default: `123`) in [config.ini](https://github.com/TanmayArya-1p/FRelay/blob/main/api/config.ini)
+- Server Runs at Port 3000 By Default (To Change this just change the port number in the Dockerfile)
 
 ## Run
-`fastapi run server.py --port <PORT>`
 
+- Build Docker Image:
+####
+    docker build -t <image_name> .
 
-- Set Master Key at `auth.py`(Default Master Key: `123`)
+- Run Created Image in a Container:
+#### 
+    docker run -d --name <container_name> -p <image_name>
+
 
 - Simulate Requests Through `/simulate`

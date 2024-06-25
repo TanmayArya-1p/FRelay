@@ -207,7 +207,7 @@ def deleter(path):
 def clearRoute(rid):
     i = rm.routeLookup(route_id)
     i.Open(remv=False)
-    threading.Thread(target=deleter,args=(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext,),daemon=True).start()
+    threading.Thread(target=deleter,args=(os.getcwd()+r"/tmp/"+str(i.rid)+"."+i.ext,),daemon=True).start()
 
 @app.get("/fetch/{route_id}",tags=["Single File Relay"])
 async def fetchFile(route_id,authkey,master_key,ses):
@@ -215,10 +215,10 @@ async def fetchFile(route_id,authkey,master_key,ses):
         i = rm.routeLookup(route_id)
         if(i!=None and i.isOpen==False and i.auth.verifyPass(authkey)):
             appendStatusStack(rm.status_bar,f"DELIVERING FILE AT '/fetch/{route_id}'")
-            returner = FileResponse(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext)
+            returner = FileResponse(os.getcwd()+r"/tmp/"+str(i.rid)+"."+i.ext)
             if(ses=="0"):
                 i.Open(remv=False)
-                threading.Thread(target=deleter,args=(os.getcwd()+"\\tmp\\"+str(i.rid)+"."+i.ext,),daemon=True).start()
+                threading.Thread(target=deleter,args=(os.getcwd()+r"/tmp/"+str(i.rid)+"."+i.ext,),daemon=True).start()
             return returner
 
         else:
