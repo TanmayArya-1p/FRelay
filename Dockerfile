@@ -1,5 +1,6 @@
 FROM ubuntu:latest
 FROM python:3.9.6
+ENV TERM="xterm"
 EXPOSE 3000
 WORKDIR /code
 RUN pip install --upgrade pip
