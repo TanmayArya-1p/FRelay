@@ -56,7 +56,7 @@ class RouteManager():
 
 			time.sleep(0.25)
 			if(os.name == "nt"):
-				os.system("cls")
+				pass
 			else:
 				os.system("clear")
 			print("FRelay",VERSION,end="\n\n")

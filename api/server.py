@@ -5,6 +5,7 @@ import threading
 from auth import RouteAuthSession,verifyMasterKey
 import json
 from hashlib import sha256 
+import time
 
 tags_metadata = [
     {
@@ -13,6 +14,11 @@ tags_metadata = [
     }]
 rm = RouteManager()
 app = FastAPI(debug=True, title="FRelay" , version=VERSION,docs_url="/simulate",openapi_tags=tags_metadata)
+
+#ELPT= epoch Last Ping Time
+config = ConfigParser()
+config.read("config.ini")
+STIMEOUT = int(dict(config._sections["frelay"])["stimeout"])
 
 
 def sessionMetaData():
@@ -26,6 +32,20 @@ def updateSessionMetaData(d):
         json.dump(d, f)
     return d
 
+
+def updateSessionELPT(sid):
+    data = sessionMetaData()
+    data[sid]["elpt"] = int(time.time())
+    updateSessionMetaData(data)
+
+def killDormantSessions():
+    data = sessionMetaData()
+    rmv = []
+    for i in data:
+        if((int(time.time()) - data[i]["elpt"]) >= STIMEOUT):
+            rmv.append(i)
+    [data.pop(i) for i in rmv]
+    updateSessionMetaData(data)
 
 def appendStatusStack(l,i,bufferLimit = 4):
     if(len(l) == bufferLimit):
@@ -45,6 +65,8 @@ async def sessionFetch(session_id,session_key,master_key):
         data = sessionMetaData()
         if(data.get(session_id) != None):
             if(data[session_id]["session_key"] == sha256(session_key.encode('utf-8')).hexdigest()):
+                updateSessionELPT(session_id)
+                killDormantSessions()
                 return data[session_id]["img_hashes"]
             else:
                 return {"message" : "session authentication failed"}
@@ -114,7 +136,8 @@ async def sessionCreate(master_key,session_key):
         session_id = generateID()
         data[session_id] = {
             "session_key": sk,
-            "img_hashes" : {}
+            "img_hashes" : [],
+            "elpt" : int(time.time())
         }
         updateSessionMetaData(data)
         return {"session_id" : session_id}
@@ -150,6 +173,7 @@ imghashes:[
 .
 .
 ]
+elpt:""
 }
 }
 """
@@ -205,7 +229,7 @@ def deleter(path):
     os.remove(path)
 
 def clearRoute(rid):
-    i = rm.routeLookup(route_id)
+    i = rm.routeLookup(rid)
     i.Open(remv=False)
     threading.Thread(target=deleter,args=(os.getcwd()+r"/tmp/"+str(i.rid)+"."+i.ext,),daemon=True).start()
 
