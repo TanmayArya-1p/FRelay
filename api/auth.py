@@ -6,12 +6,12 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import hashlib
 import sqlite3
 import bcrypt
-from configparser import ConfigParser
+import json
 
-config = ConfigParser()
-config.read("config.ini")
-mkey = dict(config._sections["frelay"])["masterkey"]
+with open('config.json') as f:
+    config = json.load(f)
 
+mkey = config["MASTERKEY"]
 MASTER_KEY = sha256(mkey.encode('utf-8')).hexdigest()
 del mkey
 con = sqlite3.connect("pass.db", check_same_thread=False)
