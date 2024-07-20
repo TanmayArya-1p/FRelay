@@ -21,10 +21,12 @@ def startup():
 threading.Thread(target=startup,daemon=True).start()
 
 @app.get("/",tags=["Methods"])
-async def ping():
+async def ping(master_key=""):
     logging.info("Server Ping Received")
     rm.status_bar.append("Server Ping Received "+str(datetime.now()).split(".")[0])
     RenderMoniter(rm)
+    if(verifyMasterKey(master_key)):
+        return {"message" : "Key Verified"}
     return {"message" : "Relay Server is Alive"}
 
 @app.get("/reset",tags=["Methods"])
