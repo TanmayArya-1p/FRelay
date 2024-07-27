@@ -29,6 +29,6 @@ def RenderMoniter(rm):
     try:
         print(tabulate(l, headers=["SNO","ROUTE ID", "STATUS"], tablefmt="rounded_outline",colalign=("center","center","center")))
         print("\nTASK HISTORY:")
-        [print(i) for i in rm.status_bar[:5]]
+        [print(i) for i in rm.status_bar[-5:]]
     except:
         pass
